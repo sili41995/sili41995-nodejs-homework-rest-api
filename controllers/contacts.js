@@ -1,7 +1,7 @@
 const { Contact } = require('../models/contact');
-const { HttpError, ctrlWrapper } = require('../utils');
+const { HttpError, ctrlWrapper, getFindOptions } = require('../utils');
 
-const getOperationsFilters = '-updatedAt -createdAt';
+const getOperationsFilters = '-updatedAt -createdAt -owner';
 const populateOptions = 'email';
 const ownerField = 'owner';
 
@@ -9,10 +9,7 @@ const getAll = async (req, res, next) => {
   const { favorite, page = 1, limit = 20 } = req.query;
   const { _id: owner } = req.user;
   const options = { skip: (page - 1) * limit, limit };
-  const findOptions = { owner };
-  if (favorite === 'true') {
-    findOptions.favorite = true;
-  }
+  const findOptions = getFindOptions({ defaultOptions: { owner }, favorite });
   const contacts = await Contact.find(
     findOptions,
     getOperationsFilters,

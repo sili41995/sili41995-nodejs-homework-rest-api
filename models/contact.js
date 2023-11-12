@@ -45,8 +45,8 @@ const updateStatusContactSchema = Joi.object({
 });
 
 const updateSchema = Joi.object()
-  .length(1)
-  .messages({ 'object.length': 'missing fields' });
+  .min(1)
+  .messages({ 'object.min': 'missing fields' });
 
 const Contact = model('contact', contactSchema);
 

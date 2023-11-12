@@ -1,5 +1,10 @@
 const express = require('express');
-const { validateBody, isValidId, authenticate } = require('../../middlewares');
+const {
+  validateBody,
+  isValidId,
+  authenticate,
+  isOwner,
+} = require('../../middlewares');
 const {
   getAll,
   getById,
@@ -18,15 +23,16 @@ const router = express.Router();
 
 router.get('/', authenticate, getAll);
 
-router.get('/:contactId', authenticate, isValidId, getById);
+router.get('/:contactId', authenticate, isOwner, isValidId, getById);
 
-router.post('/', authenticate, validateBody(addSchema), add);
+router.post('/', authenticate, isOwner, validateBody(addSchema), add);
 
-router.delete('/:contactId', authenticate, isValidId, deleteById);
+router.delete('/:contactId', authenticate, isOwner, isValidId, deleteById);
 
 router.put(
   '/:contactId',
   authenticate,
+  isOwner,
   isValidId,
   validateBody(updateSchema),
   updateById
@@ -35,6 +41,7 @@ router.put(
 router.patch(
   '/:contactId/favorite',
   authenticate,
+  isOwner,
   isValidId,
   validateBody(updateStatusContactSchema),
   updateStatusContact
