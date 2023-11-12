@@ -23,8 +23,9 @@ const getAll = async (req, res, next) => {
 
 const getById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await Contact.findById(
-    contactId,
+  const { id: userId } = req.user;
+  const contact = await Contact.findOne(
+    { _id: contactId, owner: userId },
     getOperationsFilters
   ).populate(ownerField, populateOptions);
   if (!contact) {
@@ -41,10 +42,11 @@ const add = async (req, res, next) => {
 
 const deleteById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await Contact.findByIdAndRemove(contactId).populate(
-    ownerField,
-    populateOptions
-  );
+  const { id: userId } = req.user;
+  const contact = await Contact.findOneAndDelete({
+    _id: contactId,
+    owner: userId,
+  }).populate(ownerField, populateOptions);
   if (!contact) {
     throw HttpError({ status: 404 });
   }
@@ -53,9 +55,17 @@ const deleteById = async (req, res, next) => {
 
 const updateById = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  }).populate(ownerField, populateOptions);
+  const { id: userId } = req.user;
+  const contact = await Contact.findOneAndUpdate(
+    {
+      _id: contactId,
+      owner: userId,
+    },
+    req.body,
+    {
+      new: true,
+    }
+  ).populate(ownerField, populateOptions);
   if (!contact) {
     throw HttpError({ status: 404 });
   }
@@ -64,9 +74,17 @@ const updateById = async (req, res, next) => {
 
 const updateStatusContact = async (req, res, next) => {
   const { contactId } = req.params;
-  const contact = await Contact.findByIdAndUpdate(contactId, req.body, {
-    new: true,
-  }).populate(ownerField, populateOptions);
+  const { id: userId } = req.user;
+  const contact = await Contact.findOneAndUpdate(
+    {
+      _id: contactId,
+      owner: userId,
+    },
+    req.body,
+    {
+      new: true,
+    }
+  ).populate(ownerField, populateOptions);
   if (!contact) {
     throw HttpError({ status: 404 });
   }

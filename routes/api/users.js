@@ -6,13 +6,12 @@ const {
   refresh,
   updateSubscription,
 } = require('../../controllers/users');
-const validateBody = require('../../middlewares/validateBody');
 const {
   registerSchema,
   loginSchema,
   updateSubscriptionUserSchema,
 } = require('../../models/user');
-const { authenticate } = require('../../middlewares');
+const { authenticate, validateBody } = require('../../middlewares');
 
 const router = express.Router();
 
