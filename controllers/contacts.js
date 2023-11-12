@@ -19,7 +19,7 @@ const getAll = async (req, res, next) => {
     options
   ).populate(ownerField, populateOptions);
   if (!contacts) {
-    throw HttpError({ status: 404, message: 'Not found' });
+    throw HttpError({ status: 404 });
   }
   res.status(200).json(contacts);
 };
@@ -31,7 +31,7 @@ const getById = async (req, res, next) => {
     getOperationsFilters
   ).populate(ownerField, populateOptions);
   if (!contact) {
-    throw HttpError({ status: 404, message: 'Not found' });
+    throw HttpError({ status: 404 });
   }
   res.status(200).json(contact);
 };
@@ -49,7 +49,7 @@ const deleteById = async (req, res, next) => {
     populateOptions
   );
   if (!contact) {
-    throw HttpError({ status: 404, message: 'Not found' });
+    throw HttpError({ status: 404 });
   }
   res.status(200).json({ message: 'contact deleted' });
 };
@@ -60,7 +60,7 @@ const updateById = async (req, res, next) => {
     new: true,
   }).populate(ownerField, populateOptions);
   if (!contact) {
-    throw HttpError({ status: 404, message: 'Not found' });
+    throw HttpError({ status: 404 });
   }
   res.status(200).json(contact);
 };
@@ -71,7 +71,7 @@ const updateStatusContact = async (req, res, next) => {
     new: true,
   }).populate(ownerField, populateOptions);
   if (!contact) {
-    throw HttpError({ status: 404, message: 'Not found' });
+    throw HttpError({ status: 404 });
   }
   res.status(200).json(contact);
 };
