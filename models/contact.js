@@ -1,6 +1,6 @@
 const { Schema, model } = require('mongoose');
 const Joi = require('joi');
-const { HttpError } = require('../utils');
+const { handleMongooseError } = require('../utils');
 
 const options = { versionKey: false, timestamps: true };
 
@@ -16,26 +16,37 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+    },
   },
   options
 );
 
-contactSchema.post('save', (error, data, next) => {
-  const errorMessage = error.errors.name.properties.message;
-  next(HttpError({ status: 400, message: errorMessage }));
-});
+contactSchema.post('save', handleMongooseError);
 
 const addSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().required(),
-  phone: Joi.string().required(),
+  name: Joi.string()
+    .required()
+    .messages({ 'any.required': 'missing required name field' }),
+  email: Joi.string()
+    .required()
+    .messages({ 'any.required': 'missing required email field' }),
+  phone: Joi.string()
+    .required()
+    .messages({ 'any.required': 'missing required phone field' }),
 });
 
 const updateStatusContactSchema = Joi.object({
-  favorite: Joi.boolean().required(),
+  favorite: Joi.boolean()
+    .required()
+    .messages({ 'any.required': 'missing field favorite' }),
 });
 
-const updateSchema = Joi.object().length(1);
+const updateSchema = Joi.object()
+  .min(1)
+  .messages({ 'object.min': 'missing fields' });
 
 const Contact = model('contact', contactSchema);
 
