@@ -1,5 +1,10 @@
 const { User } = require('../models/user');
-const { HttpError, ctrlWrapper } = require('../utils');
+const {
+  HttpError,
+  ctrlWrapper,
+  resizeImage,
+  getResultUpload,
+} = require('../utils');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
@@ -73,10 +78,13 @@ const updateSubscription = async (req, res, next) => {
 };
 
 const updateAvatar = async (req, res, next) => {
-  const { _id: id } = req.user;
   const { path: tempUpload, originalname } = req.file;
-  const fileName = `${id}_${originalname}`;
-  const resultUpload = path.resolve('public', 'avatars', fileName);
+  await resizeImage(tempUpload);
+  const { id, fileName, resultUpload } = getResultUpload({
+    user: req.user,
+    dirPath: ['public', 'avatars'],
+    originalname,
+  });
   try {
     await fs.rename(tempUpload, resultUpload);
   } catch (err) {

@@ -4,9 +4,7 @@ const path = require('path');
 const tmpDir = path.resolve('tmp');
 
 const multerConfig = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, tmpDir);
-  },
+  destination: tmpDir,
   filename: (req, file, cb) => {
     cb(null, file.originalname);
   },
