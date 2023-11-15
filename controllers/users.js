@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
+require('dotenv').config();
 
 const { SECRET_KEY } = process.env;
 
@@ -43,6 +44,7 @@ const login = async (req, res, next) => {
   if (!isValidPassword || !user) {
     throw HttpError({ status: 401, message: 'Email or password is wrong' });
   }
+
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '30d' });
   const response = await User.findByIdAndUpdate(
     user._id,
