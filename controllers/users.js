@@ -4,6 +4,7 @@ const {
   ctrlWrapper,
   resizeImage,
   getResultUpload,
+  sendEmail,
 } = require('../utils');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -31,6 +32,12 @@ const register = async (req, res, next) => {
     password: hashPassword,
     avatarURL,
     verificationToken,
+  });
+  await sendEmail({
+    to: email,
+    subject: 'Verify email',
+    text: 'and easy to do anywhere, even with Node.js',
+    html: '<a target="_blank" href="">Verify my email</a>',
   });
   res.status(201).json({
     user: {
