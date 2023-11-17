@@ -6,6 +6,7 @@ const {
   refresh,
   updateSubscription,
   updateAvatar,
+  verifyEmail,
 } = require('../../controllers/users');
 const {
   registerSchema,
@@ -17,6 +18,8 @@ const { authenticate, validateBody, upload } = require('../../middlewares');
 const router = express.Router();
 
 router.post('/register', validateBody(registerSchema), register);
+
+router.get('/verify/:verificationToken', verifyEmail);
 
 router.post('/login', validateBody(loginSchema), login);
 
