@@ -33,12 +33,7 @@ const register = async (req, res, next) => {
     avatarURL,
     verificationToken,
   });
-  await sendEmail({
-    to: email,
-    subject: 'Verify email',
-    text: 'and easy to do anywhere, even with Node.js',
-    html: '<a target="_blank" href="">Verify my email</a>',
-  });
+  await sendEmail({ email, verificationToken });
   res.status(201).json({
     user: {
       email: response.email,
@@ -49,7 +44,8 @@ const register = async (req, res, next) => {
 
 const verifyEmail = async (req, res, next) => {
   const { verificationToken } = req.params;
-  const user = User.findOne({ verificationToken });
+  console.log(1);
+  const user = await User.findOne({ verificationToken });
   if (!user) {
     throw HttpError({ status: 404, message: 'User not found' });
   }
