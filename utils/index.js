@@ -4,6 +4,7 @@ const getFindOptions = require('./getFindOptions');
 const getResultUpload = require('./getResultUpload');
 const handleMongooseError = require('./handleMongooseError');
 const resizeImage = require('./resizeImage');
+const sendMail = require('./sendMail');
 
 module.exports = {
   HttpError,
@@ -12,4 +13,5 @@ module.exports = {
   getFindOptions,
   resizeImage,
   getResultUpload,
+  sendMail,
 };
