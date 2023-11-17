@@ -10,6 +10,7 @@ const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
+const { nanoid } = require('nanoid');
 require('dotenv').config();
 
 const { SECRET_KEY } = process.env;
@@ -24,10 +25,12 @@ const register = async (req, res, next) => {
   const avatarURL = gravatar.url(email, {
     s: '250',
   });
+  const verificationToken = nanoid();
   const response = await User.create({
     email,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
   res.status(201).json({
     user: {
@@ -41,12 +44,13 @@ const verifyEmail = async (req, res, next) => {
   const { verificationToken } = req.params;
   const user = User.findOne({ verificationToken });
   if (!user) {
-    throw HttpError({ status: 404 });
+    throw HttpError({ status: 404, message: 'User not found' });
   }
   await User.findByIdAndUpdate(user._id, {
     verificationToken: null,
     verify: true,
   });
+  res.status(200).json({ message: 'Verification successful' });
 };
 
 const login = async (req, res, next) => {
@@ -56,7 +60,9 @@ const login = async (req, res, next) => {
   if (!isValidPassword || !user) {
     throw HttpError({ status: 401, message: 'Email or password is wrong' });
   }
-
+  if (!user.verify) {
+    throw HttpError({ status: 401, message: 'Email not verify' });
+  }
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '30d' });
   const response = await User.findByIdAndUpdate(
     user._id,
