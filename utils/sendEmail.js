@@ -10,7 +10,7 @@ const sendEmail = async ({ email, verificationToken }) => {
       to: email,
       from: 'sili41995@gmail.com',
       subject: 'Verify email',
-      html: `<a target='_blank' href='${BASE_URL}/api/users/verify/${verificationToken}'>Verify my email</a>`,
+      html: `<a target='_blank' href='${BASE_URL}/api/auth/verify/${verificationToken}'>Verify my email</a>`,
     });
     console.log('send email success');
   } catch (error) {

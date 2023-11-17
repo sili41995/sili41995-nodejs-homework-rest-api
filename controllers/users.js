@@ -42,18 +42,20 @@ const register = async (req, res, next) => {
   });
 };
 
-const verifyEmail = async (req, res, next) => {
-  const { verificationToken } = req.params;
-  console.log(1);
-  const user = await User.findOne({ verificationToken });
+const resendVerifyEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
   if (!user) {
     throw HttpError({ status: 404, message: 'User not found' });
   }
-  await User.findByIdAndUpdate(user._id, {
-    verificationToken: null,
-    verify: true,
-  });
-  res.status(200).json({ message: 'Verification successful' });
+  if (user.verify) {
+    throw HttpError({
+      status: 400,
+      message: 'Verification has already been passed',
+    });
+  }
+  await sendEmail({ email, verificationToken: user.verificationToken });
+  res.status(200).json({ message: 'Verification email sent' });
 };
 
 const login = async (req, res, next) => {
@@ -126,5 +128,5 @@ module.exports = {
   refresh: ctrlWrapper(refresh),
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
-  verifyEmail: ctrlWrapper(verifyEmail),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
 };

@@ -49,6 +49,12 @@ const registerSchema = Joi.object({
     .messages({ 'any.required': 'missing required email field' }),
 });
 
+const verifyEmailSchema = Joi.object({
+  email: Joi.string()
+    .required()
+    .messages({ 'any.required': 'missing required email field' }),
+});
+
 const loginSchema = Joi.object({
   password: Joi.string()
     .required()
@@ -75,4 +81,5 @@ module.exports = {
   registerSchema,
   loginSchema,
   updateSubscriptionUserSchema,
+  verifyEmailSchema,
 };
