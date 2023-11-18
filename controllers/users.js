@@ -4,12 +4,14 @@ const {
   ctrlWrapper,
   resizeImage,
   getResultUpload,
+  sendEmail,
 } = require('../utils');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const path = require('path');
 const fs = require('fs/promises');
+const { nanoid } = require('nanoid');
 require('dotenv').config();
 
 const { SECRET_KEY } = process.env;
@@ -24,17 +26,36 @@ const register = async (req, res, next) => {
   const avatarURL = gravatar.url(email, {
     s: '250',
   });
+  const verificationToken = nanoid();
   const response = await User.create({
     email,
     password: hashPassword,
     avatarURL,
+    verificationToken,
   });
+  await sendEmail({ email, verificationToken });
   res.status(201).json({
     user: {
       email: response.email,
       subscription: response.subscription,
     },
   });
+};
+
+const resendVerifyEmail = async (req, res, next) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw HttpError({ status: 404, message: 'User not found' });
+  }
+  if (user.verify) {
+    throw HttpError({
+      status: 400,
+      message: 'Verification has already been passed',
+    });
+  }
+  await sendEmail({ email, verificationToken: user.verificationToken });
+  res.status(200).json({ message: 'Verification email sent' });
 };
 
 const login = async (req, res, next) => {
@@ -44,7 +65,9 @@ const login = async (req, res, next) => {
   if (!isValidPassword || !user) {
     throw HttpError({ status: 401, message: 'Email or password is wrong' });
   }
-
+  if (!user.verify) {
+    throw HttpError({ status: 401, message: 'Email not verify' });
+  }
   const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '30d' });
   const response = await User.findByIdAndUpdate(
     user._id,
@@ -105,4 +128,5 @@ module.exports = {
   refresh: ctrlWrapper(refresh),
   updateSubscription: ctrlWrapper(updateSubscription),
   updateAvatar: ctrlWrapper(updateAvatar),
+  resendVerifyEmail: ctrlWrapper(resendVerifyEmail),
 };
